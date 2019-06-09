@@ -1,0 +1,201 @@
+
+<!DOCTYPE HTML>
+<html>
+	<head>
+	
+<style>
+		
+.sapUiBody{
+    background-color: white;
+    background-image: none;
+}
+.grid .tick {
+	stroke: lightgrey;
+	opacity: 0.7;
+	shape-rendering: crispEdges;
+}
+ 
+.grid path {
+	stroke-width: 0;
+}
+ 
+.axis path {
+	fill: none;
+	stroke: #bbb;
+	shape-rendering: crispEdges;
+}
+ 
+.axis text {
+	fill: #555;
+}
+ 
+.axis line {	
+	stroke: #e7e7e7;
+	shape-rendering: crispEdges;
+}
+ 
+.axis .axis-label {
+	font-size: 14px;
+}
+ .yaxis-label{
+ left: 448px;
+    position: absolute;
+    display: block;
+ }
+ 
+.line {
+	fill: none;
+	stroke-width: 2.0px;
+}
+ 
+.dot {
+	/* consider the stroke-with the mouse detect radius? */
+	stroke: transparent;
+	stroke-width: 10px;  
+	cursor: pointer;
+}
+ div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: 60px;					
+    height: 28px;					
+    padding: 2px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+.areaBelow {
+    fill: white;
+    stroke-width: 0;
+}
+.areaAbove {
+ 	fill: RGB(142,166,78);
+    stroke-width: 0;
+        opacity: 0.34;
+}
+.dot:hover {
+	stroke: rgba(68, 127, 255, 0.3);
+}
+ 
+</style>
+<svg width="960" height="1"></svg>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		
+		<script>
+		//************************************************************
+		// Data notice the structure
+		//************************************************************
+		var data = 	[
+			[{'x':1,'y':94},{'x':2,'y':8},{'x':3,'y':11},{'x':4,'y':10},{'x':5,'y':10},{'x':6,'y':94},{'x':7,'y':10},{'x':8,'y':100},{'x':9,'y':11},{'x':10,'y':10}],
+			[{'x':1,'y':9.5},{'x':2,'y':39},{'x':3,'y':10.5},{'x':4,'y':9},{'x':5,'y':100},{'x':6,'y':9},{'x':7,'y':11},{'x':8,'y':10},{'x':9,'y':11},{'x':10,'y':11}],
+			[{'x':0,'y':88},{'x':2,'y':8},{'x':3,'y':38},{'x':4,'y':8},{'x':5,'y':100},{'x':6,'y':10},{'x':7,'y':8},{'x':8,'y':8},{'x':9,'y':9},{'x':10,'y':9}]
+		];
+		
+		var colors = [
+			'steelblue',
+			'RGB(0,93,135)',
+			'RGB(226,0,26)',
+			'RGB(142,166,78)'
+		]
+		
+		var lineType = [
+		     '0 1', 
+		     '5 0',
+		     '5 0',
+		     '8 5'
+		 ]
+		 
+	
+		//************************************************************
+		// Create Margins and Axis and hook our zoom function
+		//************************************************************
+		var margin = {top: 20, right: 30, bottom: 30, left: 50},
+		    width = 960 - margin.left - margin.right,
+		    height = 500 - margin.top - margin.bottom;
+			
+		var x = d3.scale.linear()
+		    .domain([0, 12])
+		    .range([0, width]);
+		 
+		var y = d3.scale.linear()
+		    .domain([1, 100])
+		    .range([height, 0]);
+			
+		var xAxis = d3.svg.axis()
+		    .scale(x)
+			//.tickSize(-height)
+			.tickPadding(10)	
+			.tickSubdivide(true)	
+		    .orient("bottom");	
+			
+		var yAxis = d3.svg.axis()
+		    .scale(d3.scale.linear()
+		    .domain([0, 1])
+		    .range([height, 0]))
+			.tickPadding(10)
+			.tickSize(-width)
+			.tickSubdivide(true)	
+		    .orient("left").tickFormat( d3.format('.0%'));
+			
+		
+		
+
+
+		//************************************************************
+		// Generate our SVG object
+		//************************************************************	
+		var svg = d3.select("body").append("svg")
+		    .attr("width", width + margin.left + margin.right)
+		    .attr("height", height + margin.top + margin.bottom)
+		    .attr("class", "svgClass")
+			.append("g")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		 
+		svg.append("g")
+		    .attr("class", "x axis")
+		    .attr("transform", "translate(0," + height + ")")
+		    .call(xAxis);
+		 
+		svg.append("g")
+		    .attr("class", "y axis")
+		    .call(yAxis);
+		
+		
+		//************************************************************
+		// Create D3 line object and draw data on our SVG object
+		//************************************************************
+		var line = d3.svg.line()
+		    .interpolate("linear")	
+		    .x(function(d) { return x(d.x); })
+		    .y(function(d) { return y(d.y); });		
+			
+		svg.selectAll('.line')
+			.data(data)
+			.enter()
+			.append("path")
+		    .attr("class", "line")
+			.attr("clip-path", "url(#clip)")
+			.attr('stroke', function(d,i){ 			
+				return colors[i%colors.length];
+			})
+			.style("stroke-dasharray", function(d,i){
+				return lineType[i%lineType.length];	
+			})
+		    .attr("d", line)
+		    .attr("stroke-width","3px");		
+			
+
+	
+			
+	
+		</script> 
+
+	</head>
+	<body class="sapUiBody" role="application">
+	<div id="container"></div>
+	
+		<div id="content"></div>
+	</body>
+</html>
